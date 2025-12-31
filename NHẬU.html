@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lệnh Triệu Tập Anh Em</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .font-dancing { font-family: 'Dancing Script', cursive; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        /* Animation cho background gradient */
+        .bg-animated {
+            background: linear-gradient(-45deg, #2b0000, #4a0000, #1a0500, #000000); /* Tông màu đỏ/trầm cho tiệc tùng */
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3); /* Viền vàng bia */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Beer Animation */
+        .beer-cheers {
+            animation: cheers 1.5s infinite alternate;
+        }
+        @keyframes cheers {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(15deg) scale(1.1); }
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        .music-spin {
+            animation: spin 3s linear infinite;
+        }
+        @keyframes spin { 
+            100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } 
+        }
+
+        #start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-animated h-screen w-screen flex items-center justify-center text-white">
+
+    <!-- OVERLAY -->
+    <div id="start-overlay">
+        <div class="text-center animate-bounce mb-4">
+            <i class="fas fa-beer text-6xl text-yellow-500"></i>
+        </div>
+        <h2 class="font-playfair text-2xl mb-4 text-center">Có một kèo nhậu đang chờ bạn!</h2>
+        <button id="btn-open" class="px-8 py-3 bg-yellow-500 text-black font-bold rounded-full hover:bg-yellow-400 transition transform hover:scale-110 shadow-[0_0_20px_rgba(234,179,8,0.5)]">
+            MỞ THIỆP NGAY
+        </button>
+        <p class="mt-4 text-gray-500 text-xs italic">Cảnh báo: Nội dung có cồn</p>
+    </div>
+
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- TRÌNH PHÁT NHẠC (Đã cập nhật: Pickleball.mp3) -->
+    <audio id="bgMusic" loop preload="auto">
+        <!-- Đã thay đổi link nhạc tại đây -->
+        <source src="Pickleball.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="absolute top-4 right-4 z-50">
+        <button id="musicToggle" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all text-yellow-400 shadow-lg music-spin">
+            <i class="fas fa-compact-disc"></i>
+        </button>
+    </div>
+
+    <!-- Nội dung thiệp -->
+    <div id="content-layer" class="w-full max-w-lg p-4 mx-4">
+        <div class="glass-card rounded-2xl p-8 text-center relative overflow-hidden border-t-4 border-yellow-500">
+            
+            <!-- Header -->
+            <div class="mb-6">
+                <p class="text-yellow-400 tracking-[0.3em] text-xs uppercase mb-2 font-bold"⚠️ KHẨN CẤP ⚠️</p>
+                <h1 class="font-playfair text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-orange-500 uppercase drop-shadow-md">
+                    LỆNH TRIỆU TẬP
+                </h1>
+                <p class="text-sm text-gray-300 italic mt-2">"Anh em nương tựa, bia rượu là lý do"</p>
+            </div>
+
+            <!-- Icon Bia -->
+            <div class="my-6 flex justify-center items-center gap-4">
+                <div class="text-6xl text-yellow-400 beer-cheers">
+                    <i class="fas fa-beer"></i>
+                </div>
+                <div class="text-4xl text-white font-dancing">vs</div>
+                <div class="text-6xl text-yellow-400 beer-cheers" style="animation-delay: 0.5s;">
+                    <i class="fas fa-glass-cheers"></i>
+                </div>
+            </div>
+
+            <!-- Nội dung chính -->
+            <div class="space-y-4 mb-8 text-sm md:text-base bg-black/40 p-6 rounded-xl backdrop-blur-sm border border-yellow-500/30 shadow-inner">
+                <p class="font-bold text-lg text-white">Thân mời: <span class="text-yellow-400">TOÀN THỂ 500 ANH EM</span></p>
+                <hr class="border-gray-600 border-dashed my-2">
+                
+                <div class="flex items-center space-x-3 text-gray-200">
+                    <i class="far fa-clock text-yellow-500 text-xl"></i>
+                    <div class="text-left">
+                        <span class="block text-xs text-gray-400">Giờ G (Tối nay):</span>
+                        <span class="font-bold text-lg text-white">19:00 - Không cao su</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 text-gray-200">
+                    <i class="fas fa-map-marker-alt text-red-500 text-xl"></i>
+                    <div class="text-left">
+                        <span class="block text-xs text-gray-400">Căn cứ địa:</span>
+                        <!-- SỬA TÊN QUÁN TẠI ĐÂY -->
+                        <span class="font-bold text-lg text-white" contenteditable="true">QUÁN BIA CHIẾN BÉO</span>
+                    </div>
+                </div>
+                
+                <hr class="border-gray-600 border-dashed my-2">
+                <p class="font-dancing text-xl text-yellow-100 leading-relaxed mt-2">
+                    "Trăm năm kiều vẫn là kiều,<br>
+                    Tối nay không nhậu là chiều đi tong!"
+                </p>
+            </div>
+
+            <!-- Nút hành động -->
+            <button onclick="cheers()" class="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 text-white font-bold rounded-full shadow-lg shadow-orange-500/50 transition-all hover:scale-105 hover:shadow-orange-400/70 active:scale-95 w-full md:w-auto overflow-hidden">
+                <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-80 group-hover:h-80 opacity-20"></span>
+                <span class="relative flex items-center justify-center gap-2 text-lg uppercase tracking-wider">
+                    <i class="fas fa-check-circle"></i> OK! TÔI CÓ MẶT
+                </span>
+            </button>
+            
+            <p class="mt-4 text-[10px] text-gray-400 italic">
+                *Đã xem là phải đi, không đi làm... con chó (đùa thôi hihi)
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- MUSIC LOGIC ---
+        const music = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicToggle');
+        const overlay = document.getElementById('start-overlay');
+        const openBtn = document.getElementById('btn-open');
+        let isMusicPlaying = false;
+
+        // Bắt lỗi nếu không tìm thấy file nhạc
+        music.addEventListener('error', function(e) {
+            console.error("Lỗi tải nhạc:", e);
+            // Hiển thị thông báo rõ ràng cho người dùng
+            alert("⚠️ KHÔNG TÌM THẤY NHẠC!\n\nBạn chưa để file 'Pickleball.mp3' vào cùng thư mục với file thiệp này, hoặc tên file không đúng.\n\nHãy kiểm tra lại nhé!");
+        }, true);
+
+        openBtn.addEventListener('click', function() {
+            // Hiệu ứng ẩn màn hình chào
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 800);
+            
+            // Kích hoạt nhạc
+            music.volume = 1.0;
+            var playPromise = music.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('music-spin', 'bg-yellow-500/20');
+                })
+                .catch(error => {
+                    console.log("Autoplay bị chặn hoặc lỗi file:", error);
+                    // Nếu lỗi do autoplay, alert nhắc người dùng
+                    if(error.name === 'NotAllowedError') {
+                        alert("Vui lòng chạm vào màn hình thêm lần nữa để bật nhạc!");
+                    }
+                });
+            }
+            createFirework(width/2, height/2);
+        });
+
+        musicBtn.addEventListener('click', function() {
+            if (isMusicPlaying) {
+                music.pause();
+                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+                musicBtn.classList.remove('music-spin', 'bg-yellow-500/20');
+            } else {
+                music.play();
+                musicBtn.innerHTML = '<i class="fas fa-compact-disc"></i>';
+                musicBtn.classList.add('music-spin', 'bg-yellow-500/20');
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
+
+        // --- FIREWORKS LOGIC ---
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color, speed, angle) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.cos(angle) * speed;
+                this.speedY = Math.sin(angle) * speed;
+                this.life = 100;
+                this.alpha = 1;
+                this.gravity = 0.05;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.life--;
+                this.alpha -= 0.01;
+                this.size *= 0.98;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createFirework(x, y) {
+            const particleCount = 80;
+            // Màu bia: Vàng, Cam, Trắng
+            const colors = ['#FFD700', '#FFA500', '#FFFFFF', '#FFFFE0']; 
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < particleCount; i++) {
+                const speed = Math.random() * 5 + 2;
+                const angle = Math.random() * Math.PI * 2;
+                particles.push(new Particle(x, y, color, speed, angle));
+            }
+        }
+
+        function loop() {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, width, height);
+            ctx.globalCompositeOperation = 'lighter';
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0 || particles[i].alpha <= 0) particles.splice(i, 1);
+            }
+            if (Math.random() < 0.05) createFirework(Math.random() * width, Math.random() * height * 0.5);
+            requestAnimationFrame(loop);
+        }
+
+        function cheers() {
+            // Thử phát nhạc lại nếu chưa chạy
+            if (!isMusicPlaying) { 
+                music.play().then(() => {
+                    isMusicPlaying = true; 
+                    musicBtn.classList.add('music-spin');
+                }).catch(e => console.log("Không thể phát nhạc:", e));
+            }
+            
+            // Bắn pháo hoa liên tục
+            createFirework(width / 2, height / 2);
+            setTimeout(() => createFirework(width / 3, height / 3), 100);
+            setTimeout(() => createFirework(width * 2/3, height / 3), 200);
+
+            const btn = document.querySelector('button.group');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-beer"></i> 1, 2, 3 DÔ !!!';
+            btn.classList.remove('from-yellow-600', 'to-orange-600');
+            btn.classList.add('from-green-600', 'to-green-700');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.add('from-yellow-600', 'to-orange-600');
+                btn.classList.remove('from-green-600', 'to-green-700');
+            }, 3000);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
